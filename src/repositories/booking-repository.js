@@ -1,7 +1,7 @@
 const { StatusCodes } =  require('http-status-codes');
 
 const { Booking } = require('../models');
-const CrudRespository = require('./crud-repository');
+const CrudRepository = require('./crud-repository');
 
 class BookingRepository extends CrudRepository {
     constructor() {
