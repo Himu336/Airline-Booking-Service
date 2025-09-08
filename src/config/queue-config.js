@@ -4,7 +4,7 @@ let channel,connection;
 
 async function connectQueue() {
     try {
-        connection = await amqplib.connect('amqp://localhost');
+        connection = await amqplib.connect('amqps://mtmceyxh:ISPCD-YRQzKVwkoyrZzIC4Q_DItH0PAq@leopard.lmq.cloudamqp.com/mtmceyxh');
         channel = await connection.createChannel();
 
         await channel.assertQueue("noti-queue");
