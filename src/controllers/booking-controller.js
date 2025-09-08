@@ -8,7 +8,8 @@ async function createBooking(req, res){
         const response = await BookingService.createBooking({
             flightId: req.body.flightId,
             userId: req.body.userId,
-            noOfSeats: req.body.noOfSeats
+            noOfSeats: req.body.noOfSeats,
+            recepientEmail: req.body.recepientEmail
         });
         SuccessResponse.data = response;
         return res
@@ -26,7 +27,7 @@ async function createBooking(req, res){
 async function makePayment(req, res){
     try{
         const idempotencyKey = req.headers['x-idempotency-key'];
-        if(!!idempotencyKey){
+        if(!idempotencyKey){
             return res
                 .status(StatusCodes.BAD_REQUEST)
                 .json({message:'idmpotency key missiong'});

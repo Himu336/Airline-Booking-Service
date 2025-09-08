@@ -26,8 +26,31 @@ async function createBooking(data){
             seats: data.noOfSeats
         });
 
+        // Send notification to queue with dynamic recepientEmail if provided
+        // Send notification to queue with dynamic recepientEmail if provided
+       if (data.recepientEmail) {
+                Queue.sendData({
+                    recepientEmail: data.recepientEmail,
+                    subject: 'SkyConnect: Your Flight Booking Confirmation',
+                    text: `
+            SkyConnect - Your trusted partner in travel
+
+            Booking Confirmation
+            ---------------------
+            Booking ID: ${booking.id}
+
+            Check out the project on GitHub:
+            - My Profile: https://github.com/Himu336
+            - Star The Repo: https://github.com/Himu336/Distributed-Airline-Booking-Backend
+
+            Safe travels,
+            Team SkyConnect ✈️
+                    `
+                });
+            }
+
         await transaction.commit();
-        
+
         return booking;
 
     } catch (error){
@@ -41,33 +64,24 @@ async function makePayment(data) {
     const transaction = await db.sequelize.transaction();
     try {
         const bookingDetails = await bookingRepository.get(data.bookingId, transaction);
-
-        if(bookingDetails.status == CANCELLED){
+        if(bookingDetails.status == CANCELLED) {
             throw new AppError('The booking has expired', StatusCodes.BAD_REQUEST);
         }
-
+        console.log(bookingDetails);
         const bookingTime = new Date(bookingDetails.createdAt);
         const currentTime = new Date();
-        if(currentTime - bookingTime > 300000){
+        if(currentTime - bookingTime > 300000) {
             await cancelBooking(data.bookingId);
-            throw new AppError('The booking has Expired', StatusCodes.BAD_REQUEST);
+            throw new AppError('The booking has expired', StatusCodes.BAD_REQUEST);
         }
-
         if(bookingDetails.totalCost != data.totalCost) {
-            throw new AppError('The amount of payment doesnt match', StatusCodes.BAD_REQUEST);
+            throw new AppError('The amount of the payment doesnt match', StatusCodes.BAD_REQUEST);
         }
-        if(bookingDetails.userId != data.userId){
+        if(bookingDetails.userId != data.userId) {
             throw new AppError('The user corresponding to the booking doesnt match', StatusCodes.BAD_REQUEST);
         }
-
-        const response = await bookingRepository.update(data.bookingId, {status: BOOKED}, transaction);
-
-        await Queue.sendData({
-            recepientEmail: 'himanshbansal200521@gmail.com',
-            subject: 'Flight Booked',
-            text: `Booking successfully done for the Booking id ${data.bookingId}, lesss gooo!!!`
-        });
-
+        // we assume here that payment is successful
+        await bookingRepository.update(data.bookingId, {status: BOOKED}, transaction);
         await transaction.commit();
         
     } catch (error){
@@ -80,17 +94,17 @@ async function cancelBooking(bookingId){
     const transaction = await db.sequelize.transaction();
     try{
         const bookingDetails = await bookingRepository.get(bookingId, transaction);
-        if(bookingDetails.status == CANCELLED){
+        console.log(bookingDetails);
+        if(bookingDetails.status == CANCELLED) {
             await transaction.commit();
             return true;
         }
-
         await axios.patch(`${ServerConfig.FLIGHT_SERVICE}/api/v1/flights/${bookingDetails.flightId}/seats`, {
-            seats: bookingDetails.totalSeats,
-            dec: 0
+            seats: bookingDetails.noOfSeats,
         });
         await bookingRepository.update(bookingId, {status: CANCELLED}, transaction);
         await transaction.commit();
+
     } catch (error){
         await transaction.rollback();
         throw error;
