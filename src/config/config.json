@@ -1,9 +1,10 @@
 {
   "development": {
     "username": "root",
-    "password": "pro.himu123",
-    "database": "Flights",
-    "host": "127.0.0.1",
+    "password": "GobnnHnwpkSgmEHPcVDiQrtgkDifXGzw",
+    "database": "railway",
+    "host": "yamabiko.proxy.rlwy.net",
+    "port": 59288,
     "dialect": "mysql"
   },
   "test": {
@@ -15,9 +16,10 @@
   },
   "production": {
     "username": "root",
-    "password": null,
-    "database": "database_production" ,
-    "host": "127.0.0.1",
+    "password": "GobnnHnwpkSgmEHPcVDiQrtgkDifXGzw",
+    "database": "railway",
+    "host": "yamabiko.proxy.rlwy.net",
+    "port": 59288,
     "dialect": "mysql"
   }
 }
